@@ -1,0 +1,94 @@
+---
+import { Icon } from "astro-icon/components";
+import type { MarkdownHeading } from "astro";
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const items = Astro.props.headings.filter((h) => h.depth === 2);
+
+const desktopLink =
+  "-ml-px block border-l-2 border-transparent py-1.5 pl-4 text-sm text-muted transition-colors hover:text-foreground data-active:border-primary data-active:font-medium data-active:text-primary";
+const mobileLink =
+  "block rounded-md px-2 py-2 text-sm text-muted transition-colors hover:text-foreground data-active:font-medium data-active:text-primary";
+---
+
+{
+  items.length > 1 && (
+    <div data-toc>
+      <details class="group rounded-lg border border-border bg-surface lg:hidden">
+        <summary class="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium [&::-webkit-details-marker]:hidden">
+          On this page
+          <Icon name="lucide:chevron-down" class="size-4 transition-transform group-open:rotate-180" />
+        </summary>
+        <ul class="border-t border-border p-2">
+          {items.map((h) => (
+            <li>
+              <a href={`#${h.slug}`} data-toc-link class={mobileLink}>{h.text}</a>
+            </li>
+          ))}
+        </ul>
+      </details>
+
+      <nav aria-label="On this page" class="hidden lg:block">
+        <p class="mb-3 text-xs font-semibold tracking-wider text-muted uppercase">On this page</p>
+        <ul class="border-l border-border">
+          {items.map((h) => (
+            <li>
+              <a href={`#${h.slug}`} data-toc-link class={desktopLink}>{h.text}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  )
+}
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-toc]");
+
+  if (root) {
+    const links = Array.from(root.querySelectorAll<HTMLAnchorElement>("[data-toc-link]"));
+    const targets = Array.from(new Set(links.map((l) => decodeURIComponent(l.hash.slice(1)))))
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    const setActive = (id: string | undefined) => {
+      links.forEach((link) => {
+        const active = decodeURIComponent(link.hash.slice(1)) === id;
+        link.toggleAttribute("data-active", active);
+        if (active) link.setAttribute("aria-current", "location");
+        else link.removeAttribute("aria-current");
+      });
+    };
+
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      let current = targets[0]?.id;
+      for (const target of targets) {
+        if (target.getBoundingClientRect().top <= 130) current = target.id;
+        else break;
+      }
+      setActive(current);
+    };
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true },
+    );
+    update();
+
+    // On mobile, collapse the list after choosing a section
+    root.querySelector("details")?.addEventListener("click", (event) => {
+      if ((event.target as Element).closest("a")) root.querySelector("details")?.removeAttribute("open");
+    });
+  }
+</script>

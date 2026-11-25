@@ -1,0 +1,186 @@
+---
+import { Icon } from "astro-icon/components";
+import PageLayout from "@/layouts/PageLayout.astro";
+import PageHero from "@/components/ui/PageHero.astro";
+import Container from "@/components/ui/Container.astro";
+import Section from "@/components/ui/Section.astro";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import LazyMap from "@/components/ui/LazyMap.astro";
+import JsonLd from "@/components/seo/JsonLd.astro";
+import ContactForm from "@/features/contact/ContactForm.astro";
+import { siteConfig } from "@/config/site";
+import { socialLinks } from "@/config/social";
+import { mapEmbedUrl, mapsLink, offices } from "@/config/offices";
+import { whatsappUrl } from "@/lib/contact";
+import { contactPageSchema } from "@/lib/schema";
+import heroImage from "@/assets/contact-us.jpg";
+
+const { contact } = siteConfig;
+
+const title = "Contact Us - Get a Free Quote";
+const description = `Contact Dewlon Systems in Nairobi or Kisii. Call ${contact.phoneDisplay} or send your project details online and get a free quote within 24 hours.`;
+
+const channels = [
+  { icon: "lucide:phone", label: "Call us", value: contact.phoneDisplay, href: `tel:${contact.phone}` },
+  { icon: "fa6-brands:whatsapp", label: "WhatsApp", value: "Chat with us", href: whatsappUrl(), external: true },
+  { icon: "lucide:mail", label: "Email", value: contact.email, href: `mailto:${contact.email}` },
+];
+
+const reassurance = ["Reply within 24 hours", "Free consultation", "No obligation"];
+
+const steps = [
+  { title: "We read your message", text: "Someone on the team reviews your details and the problem you want solved." },
+  { title: "We get back to you", text: "Expect a call or an email within 24 hours, usually sooner." },
+  { title: "Free consultation", text: "We talk through scope and options, then send you a clear plan and quote." },
+];
+
+const panelSocials = socialLinks.filter((s) => s.inHeader);
+---
+
+<PageLayout {title} {description} overlayHeader>
+  <JsonLd slot="head" data={contactPageSchema(description)} />
+
+  <PageHero
+    overlap
+    image={heroImage}
+    crumbs={[{ name: "Contact", path: "/contact" }]}
+    eyebrow="Contact"
+    title="Let’s talk about what you’re building"
+    description="Tell us about your project. We’ll come back with honest advice and a clear plan, usually within a few hours."
+  >
+    <ul class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/85">
+      {
+        reassurance.map((text) => (
+          <li class="flex items-center gap-2">
+            <Icon name="lucide:check" class="size-4 text-white" />
+            {text}
+          </li>
+        ))
+      }
+    </ul>
+  </PageHero>
+
+  <!-- Form + contact details, overlapping the hero -->
+  <section class="relative z-10 -mt-20 pb-16 sm:-mt-24 lg:-mt-28 lg:pb-24">
+    <Container>
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-8">
+        <div
+          id="start-project"
+          class="order-1 scroll-mt-24 rounded-lg border border-border bg-surface p-6 shadow-xl shadow-black/5 sm:p-10"
+        >
+          <h2 class="text-2xl font-bold">Send us a message</h2>
+          <p class="mt-2 mb-8 text-muted">The more detail you share, the better we can prepare. It takes about two minutes.</p>
+          <ContactForm />
+        </div>
+
+        <aside class="order-2 rounded-lg bg-brand p-6 text-brand-foreground sm:p-8 lg:self-start">
+          <h2 class="font-sans text-lg font-semibold">Prefer to talk?</h2>
+          <p class="mt-2 text-sm leading-relaxed text-white/70">Skip the form and reach us directly.</p>
+
+          <ul class="mt-6 divide-y divide-white/15 border-y border-white/15">
+            {
+              channels.map((c) => (
+                <li>
+                  <a
+                    href={c.href}
+                    target={c.external ? "_blank" : undefined}
+                    rel={c.external ? "noopener noreferrer" : undefined}
+                    class="group flex items-center gap-4 py-4"
+                  >
+                    <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/10 transition-colors group-hover:bg-white/20">
+                      <Icon name={c.icon} class="size-5" />
+                    </span>
+                    <span class="min-w-0">
+                      <span class="block text-xs tracking-wider text-white/60 uppercase">{c.label}</span>
+                      <span class="block font-medium break-words">{c.value}</span>
+                    </span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+
+          <div class="mt-6 flex items-start gap-3 text-sm">
+            <Icon name="lucide:clock" class="mt-0.5 size-4 shrink-0 text-white/60" />
+            <div class="text-white/80">
+              {offices[0].hours.map((line) => <p>{line}</p>)}
+            </div>
+          </div>
+
+          <ul class="mt-6 flex gap-2">
+            {
+              panelSocials.map((s) => (
+                <li>
+                  <a
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.label}
+                    class="flex size-9 items-center justify-center rounded-md border border-white/20 transition-colors hover:bg-white/10"
+                  >
+                    <Icon name={s.icon} class="size-4" />
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </aside>
+      </div>
+    </Container>
+  </section>
+
+  <!-- What happens next -->
+  <Section class="pt-0 sm:pt-0 lg:pt-0">
+    <SectionHeading eyebrow="Next steps" title="What happens after you reach out" />
+    <ol class="mt-10 grid gap-8 md:grid-cols-3">
+      {
+        steps.map((step, i) => (
+          <li class="border-t border-border pt-5">
+            <span class="font-display text-sm font-bold text-primary">{String(i + 1).padStart(2, "0")}</span>
+            <h3 class="mt-3 font-sans text-base font-semibold">{step.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-muted">{step.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </Section>
+
+  <!-- Offices -->
+  <Section id="offices" tone="muted">
+    <SectionHeading
+      eyebrow="Offices"
+      title="Where to find us"
+      description="Visit us in Nairobi or Kisii, or work with us remotely from anywhere."
+    />
+
+    <div class="mt-10 grid gap-10 lg:grid-cols-2 lg:gap-14">
+      <ul class="divide-y divide-border border-y border-border">
+        {
+          offices.map((o) => {
+            const Tag = o.remote ? "div" : "address";
+            return (
+              <li class="flex gap-4 py-6">
+                <span class="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                  <Icon name={o.remote ? "lucide:globe" : "lucide:map-pin"} class="size-5" />
+                </span>
+                <Tag class="min-w-0 not-italic">
+                  <p class="text-xs font-semibold tracking-wider text-primary uppercase">{o.tag}</p>
+                  <h3 class="mt-0.5 font-sans text-base font-semibold">{o.name}</h3>
+                  <p class="mt-1 text-sm text-muted">{o.location}</p>
+                  <div class="mt-3 space-y-0.5 text-sm">
+                    {o.hours.map((line) => <p>{line}</p>)}
+                  </div>
+                </Tag>
+              </li>
+            );
+          })
+        }
+      </ul>
+
+      <div>
+        <LazyMap src={mapEmbedUrl} title="Dewlon Systems head office, Imara Daima, Nairobi" href={mapsLink} />
+        <p class="mt-3 text-sm text-muted">Head office · Imara Daima, Nairobi, Kenya</p>
+      </div>
+    </div>
+  </Section>
+</PageLayout>

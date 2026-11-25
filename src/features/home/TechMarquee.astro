@@ -1,0 +1,32 @@
+---
+import { techStack } from "./content";
+---
+
+<section aria-label="Technologies we work with" class="border-b border-border bg-surface">
+  <div class="overflow-hidden py-5 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+    <div
+      class="flex w-max animate-marquee hover:[animation-play-state:paused] motion-reduce:w-auto motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center"
+    >
+      <ul class="flex shrink-0 items-center gap-10 pr-10 motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:pr-0">
+        {
+          techStack.map((tech) => (
+            <li class="flex items-center gap-3 text-sm font-medium tracking-wider whitespace-nowrap text-muted uppercase">
+              <span class="size-1 rounded-full bg-accent" />
+              {tech}
+            </li>
+          ))
+        }
+      </ul>
+      <ul aria-hidden="true" class="flex shrink-0 items-center gap-10 pr-10 motion-reduce:hidden">
+        {
+          techStack.map((tech) => (
+            <li class="flex items-center gap-3 text-sm font-medium tracking-wider whitespace-nowrap text-muted uppercase">
+              <span class="size-1 rounded-full bg-accent" />
+              {tech}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

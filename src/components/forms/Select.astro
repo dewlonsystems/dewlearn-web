@@ -1,0 +1,54 @@
+---
+import { Icon } from "astro-icon/components";
+import type { HTMLAttributes } from "astro/types";
+import Field from "@/components/forms/Field.astro";
+import { cn } from "@/lib/cn";
+import { controlClass } from "@/lib/ui/classes";
+
+interface Props extends Omit<HTMLAttributes<"select">, "id" | "name" | "value"> {
+  name: string;
+  label: string;
+  options: { value: string; label: string }[];
+  value?: string;
+  placeholder?: string;
+  id?: string;
+  hint?: string;
+  wrapperClass?: string;
+}
+
+const {
+  name,
+  label,
+  options,
+  value,
+  placeholder = "Select an option",
+  id = `field-${name}`,
+  hint,
+  wrapperClass,
+  class: className,
+  required,
+  ...rest
+} = Astro.props;
+
+const describedBy = [hint ? `${id}-hint` : "", `${id}-error`].filter(Boolean).join(" ");
+---
+
+<Field {id} {label} {hint} {required} class={wrapperClass}>
+  <div class="relative">
+    <select
+      {...rest}
+      {id}
+      {name}
+      {required}
+      aria-describedby={describedBy}
+      class={cn(controlClass, "h-11 cursor-pointer appearance-none pr-10", className)}
+    >
+      <option value="" disabled selected={!value}>{placeholder}</option>
+      {options.map((o) => <option value={o.value} selected={o.value === value}>{o.label}</option>)}
+    </select>
+    <Icon
+      name="lucide:chevron-down"
+      class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted"
+    />
+  </div>
+</Field>

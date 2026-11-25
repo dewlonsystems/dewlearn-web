@@ -1,0 +1,91 @@
+---
+import { Icon } from "astro-icon/components";
+import { siteConfig } from "@/config/site";
+
+const { email, phone, phoneDisplay, whatsapp, whatsappMessage } = siteConfig.contact;
+
+const whatsappHref = `https://wa.me/${whatsapp}?text=${encodeURIComponent(whatsappMessage)}`;
+
+const options = [
+  {
+    label: "Chat with Dewi",
+    detail: "Our AI assistant, answers instantly",
+    href: "/chat",
+    icon: "lucide:bot",
+    iconClass: "bg-primary/10 text-primary",
+    noCrawl: true,
+  },
+  {
+    label: "Chat on WhatsApp",
+    detail: "Usually replies quickly",
+    href: whatsappHref,
+    icon: "fa6-brands:whatsapp",
+    iconClass: "bg-[#25D366]/15 text-[#128C7E] dark:text-[#25D366]",
+    external: true,
+  },
+  {
+    label: "Start a project",
+    detail: "Tell us what you need",
+    href: "/contact",
+    icon: "lucide:message-square-text",
+    iconClass: "bg-primary/10 text-primary",
+  },
+  {
+    label: "Call us",
+    detail: phoneDisplay,
+    href: `tel:${phone}`,
+    icon: "lucide:phone",
+    iconClass: "bg-primary/10 text-primary",
+  },
+  {
+    label: "Email us",
+    detail: email,
+    href: `mailto:${email}`,
+    icon: "lucide:mail",
+    iconClass: "bg-primary/10 text-primary",
+  },
+];
+---
+
+<div class="fixed right-4 bottom-4 z-40 sm:right-6 sm:bottom-6">
+  <button
+    type="button"
+    popovertarget="contact-popover"
+    aria-label="Contact Dewlon Systems"
+    class="flex size-12 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg shadow-black/20 transition-transform hover:scale-105 active:scale-95 sm:size-14"
+  >
+    <Icon name="lucide:message-circle" class="size-6" />
+  </button>
+
+  <!-- No display utility on the popover itself: it would override the browser's hide rule -->
+  <div
+    id="contact-popover"
+    popover="auto"
+    class="top-auto left-auto m-0 w-72 origin-bottom-right border border-border bg-surface p-2 text-foreground shadow-xl shadow-black/10 open:animate-zoom-in bottom-20 right-4 rounded-lg sm:right-6 sm:bottom-24"
+  >
+    <p class="px-3 pt-2 pb-1 text-sm font-semibold">How can we help?</p>
+    <ul>
+      {
+        options.map((o) => (
+          <li>
+            <a
+              href={o.href}
+              target={o.external ? "_blank" : undefined}
+              rel={o.external ? "noopener noreferrer" : o.noCrawl ? "nofollow" : undefined}
+              data-astro-prefetch={o.noCrawl ? "false" : undefined}
+              class="flex items-center gap-3 rounded-md p-3 transition-colors hover:bg-foreground/5"
+            >
+              <span class:list={["flex size-9 shrink-0 items-center justify-center rounded-md", o.iconClass]}>
+                <Icon name={o.icon} class="size-5" />
+              </span>
+              <span class="min-w-0">
+                <span class="block text-sm font-medium">{o.label}</span>
+                <span class="block truncate text-xs text-muted">{o.detail}</span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</div>

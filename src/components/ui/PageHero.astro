@@ -1,0 +1,51 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import Container from "@/components/ui/Container.astro";
+import Breadcrumbs from "@/components/ui/Breadcrumbs.astro";
+import { cn } from "@/lib/cn";
+
+interface Props {
+  title: string;
+  description?: string;
+  eyebrow?: string;
+  /** Trail after Home, e.g. [{ name: "Contact", path: "/contact" }] */
+  crumbs: { name: string; path: string }[];
+  image?: ImageMetadata;
+  /** Adds bottom space so the next section can overlap the hero. */
+  overlap?: boolean;
+  class?: string;
+}
+
+const { title, description, eyebrow, crumbs, image, overlap = false, class: className } = Astro.props;
+---
+
+<section class={cn("relative isolate overflow-hidden bg-brand text-brand-foreground", className)}>
+  {
+    image && (
+      <>
+        <Image
+          src={image}
+          alt=""
+          widths={[640, 1024, 1600, 2000]}
+          sizes="100vw"
+          loading="eager"
+          fetchpriority="high"
+          class="absolute inset-0 -z-10 size-full object-cover"
+        />
+        <div class="absolute inset-0 -z-10 bg-brand/88"></div>
+      </>
+    )
+  }
+
+  <!-- Pages using this hero must pass overlayHeader to PageLayout; the top padding clears the transparent header -->
+  <Container class={cn("pt-28 sm:pt-32 lg:pt-40", overlap ? "pb-28 sm:pb-32 lg:pb-40" : "pb-14 sm:pb-16 lg:pb-20")}>
+    <Breadcrumbs items={crumbs} tone="onDark" />
+    <div class="mt-6 max-w-2xl">
+      {eyebrow && <p class="text-sm font-semibold tracking-wider text-white/70 uppercase">{eyebrow}</p>}
+      <h1 class={cn("text-4xl font-bold text-balance sm:text-5xl", eyebrow && "mt-3")}>{title}</h1>
+      {description && <p class="mt-5 max-w-xl text-lg leading-relaxed text-white/75">{description}</p>}
+      <div class="mt-6 empty:hidden"><slot /></div>
+    </div>
+  </Container>
+</section>

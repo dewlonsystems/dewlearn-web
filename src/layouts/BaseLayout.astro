@@ -1,0 +1,37 @@
+---
+import "@/styles/global.css";
+import type { ComponentProps } from "astro/types";
+import Seo from "@/components/seo/Seo.astro";
+import JsonLd from "@/components/seo/JsonLd.astro";
+import ConfirmDialog from "@/components/ui/ConfirmDialog.astro";
+import { siteConfig } from "@/config/site";
+import { organizationSchema, websiteSchema } from "@/lib/schema";
+
+type Props = ComponentProps<typeof Seo>;
+const seo = Astro.props;
+---
+
+<!doctype html>
+<html lang={siteConfig.locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content={siteConfig.themeColor.light} media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content={siteConfig.themeColor.dark} media="(prefers-color-scheme: dark)" />
+    <meta name="application-name" content={siteConfig.name} />
+
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <Seo {...seo} />
+    <JsonLd data={[organizationSchema(), websiteSchema()]} />
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+    <ConfirmDialog />
+  </body>
+</html>

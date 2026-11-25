@@ -1,0 +1,26 @@
+---
+import { CAPTCHA_PROVIDER, RECAPTCHA_SITE_KEY, TURNSTILE_SITE_KEY } from "astro:env/client";
+
+const siteKey =
+  CAPTCHA_PROVIDER === "turnstile" ? TURNSTILE_SITE_KEY : CAPTCHA_PROVIDER === "recaptcha" ? RECAPTCHA_SITE_KEY : undefined;
+
+if (CAPTCHA_PROVIDER !== "none" && !siteKey) {
+  throw new Error(`CAPTCHA_PROVIDER is "${CAPTCHA_PROVIDER}" but its site key is missing in .env`);
+}
+---
+
+{
+  CAPTCHA_PROVIDER !== "none" && (
+    <div data-field>
+      <dewlon-captcha class="block" data-provider={CAPTCHA_PROVIDER} data-sitekey={siteKey}>
+        <div data-captcha-mount class="min-h-16.25" />
+        <input type="hidden" name="captchaToken" />
+      </dewlon-captcha>
+      <p data-error hidden class="mt-1.5 text-xs font-medium text-danger" />
+    </div>
+  )
+}
+
+<script>
+  import "@/lib/captcha/element";
+</script>

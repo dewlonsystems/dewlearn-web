@@ -1,16 +1,50 @@
 ---
+import PageLayout from "@/layouts/PageLayout.astro";
+import CtaBanner from "@/components/ui/CtaBanner.astro";
+import JsonLd from "@/components/seo/JsonLd.astro";
+import Hero from "@/features/home/Hero.astro";
+import TechMarquee from "@/features/home/TechMarquee.astro";
+import About from "@/features/home/About.astro";
+import Stats from "@/features/home/Stats.astro";
+import ServicesPreview from "@/features/home/ServicesPreview.astro";
+import Process from "@/features/home/Process.astro";
+import Industries from "@/features/home/Industries.astro";
+import Portfolio from "@/features/home/Portfolio.astro";
+import Testimonials from "@/features/home/Testimonials.astro";
+import Faq from "@/features/home/Faq.astro";
+import { faqs } from "@/features/home/content";
+import { siteConfig } from "@/config/site";
+import { faqSchema, localBusinessSchema, webPageSchema } from "@/lib/schema";
+
+const { contact } = siteConfig;
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<PageLayout overlayHeader>
+  <JsonLd
+    slot="head"
+    data={[
+      localBusinessSchema(),
+      webPageSchema({ path: "/", name: siteConfig.title.default, description: siteConfig.description }),
+      faqSchema(faqs.map((f) => ({ question: f.q, answer: f.a }))),
+    ]}
+  />
+
+  <Hero />
+  <TechMarquee />
+  <About />
+  <Stats />
+  <ServicesPreview />
+  <Process />
+  <Industries />
+  <Portfolio />
+  <Testimonials />
+  <Faq />
+
+  <CtaBanner
+    eyebrow="Let’s work together"
+    title="Ready to build something that lasts?"
+    description="Tell us about your project. We’ll come back within one business day with a clear plan, an honest scope and a fair quote."
+    primary={{ label: "Get a free quote", href: "/contact" }}
+    secondary={{ label: contact.phoneDisplay, href: `tel:${contact.phone}` }}
+  />
+</PageLayout>

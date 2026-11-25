@@ -1,0 +1,40 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Field from "@/components/forms/Field.astro";
+import { cn } from "@/lib/cn";
+import { controlClass } from "@/lib/ui/classes";
+
+interface Props extends Omit<HTMLAttributes<"input">, "id" | "name"> {
+  name: string;
+  label: string;
+  id?: string;
+  hint?: string;
+  wrapperClass?: string;
+}
+
+const {
+  name,
+  label,
+  id = `field-${name}`,
+  hint,
+  wrapperClass,
+  class: className,
+  type = "text",
+  required,
+  ...rest
+} = Astro.props;
+
+const describedBy = [hint ? `${id}-hint` : "", `${id}-error`].filter(Boolean).join(" ");
+---
+
+<Field {id} {label} {hint} {required} class={wrapperClass}>
+  <input
+    {...rest}
+    {id}
+    {name}
+    {type}
+    {required}
+    aria-describedby={describedBy}
+    class={cn(controlClass, "h-11", className)}
+  />
+</Field>

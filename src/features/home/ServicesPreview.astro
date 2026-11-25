@@ -1,0 +1,46 @@
+---
+import { Icon } from "astro-icon/components";
+import Section from "@/components/ui/Section.astro";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import Button from "@/components/ui/Button.astro";
+import { services, type Offering } from "@/config/offerings";
+import { featuredServiceSlugs } from "./content";
+
+const featured = featuredServiceSlugs
+  .map((slug) => services.find((s) => s.slug === slug))
+  .filter((s): s is Offering => s !== undefined);
+---
+
+<Section id="services">
+  <div class="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+    <SectionHeading
+      eyebrow="What we build"
+      title="A full spectrum of digital engineering"
+      description="From a first landing page to an enterprise platform, we have the depth to deliver it."
+    />
+    <Button href="/services" variant="outline" class="self-start lg:self-auto">
+      View all {services.length} services
+      <Icon name="lucide:arrow-right" class="size-4" />
+    </Button>
+  </div>
+
+  <ul class="mt-12 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+    {
+      featured.map((service) => (
+        <li class="bg-background">
+          <a href={service.path} class="group flex h-full flex-col p-7 transition-colors hover:bg-surface">
+            <span class="flex size-11 items-center justify-center rounded-md bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+              <Icon name={service.icon} class="size-5" />
+            </span>
+            <h3 class="mt-5 font-sans text-lg font-semibold">{service.name}</h3>
+            <p class="mt-2 flex-1 text-sm leading-relaxed text-muted">{service.description}</p>
+            <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary">
+              Learn more
+              <Icon name="lucide:arrow-right" class="size-4 transition-transform group-hover:translate-x-1" />
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Section>

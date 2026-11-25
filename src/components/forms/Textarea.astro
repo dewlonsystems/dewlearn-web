@@ -1,0 +1,50 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Field from "@/components/forms/Field.astro";
+import { cn } from "@/lib/cn";
+import { controlClass } from "@/lib/ui/classes";
+
+interface Props extends Omit<HTMLAttributes<"textarea">, "id" | "name"> {
+  name: string;
+  label: string;
+  id?: string;
+  hint?: string;
+  wrapperClass?: string;
+  showCount?: boolean;
+}
+
+const {
+  name,
+  label,
+  id = `field-${name}`,
+  hint,
+  wrapperClass,
+  showCount,
+  class: className,
+  required,
+  rows = 5,
+  maxlength,
+  ...rest
+} = Astro.props;
+
+const describedBy = [hint ? `${id}-hint` : "", `${id}-error`].filter(Boolean).join(" ");
+---
+
+<Field {id} {label} {hint} {required} class={wrapperClass}>
+  <textarea
+    {...rest}
+    {id}
+    {name}
+    {rows}
+    {required}
+    {maxlength}
+    aria-describedby={describedBy}
+    class={cn(controlClass, "min-h-28 resize-y py-2.5 leading-relaxed", className)}></textarea>
+  {
+    showCount && maxlength && (
+      <p class="text-right text-xs text-muted" aria-hidden="true">
+        <span data-count-for={id}>0</span> / {maxlength}
+      </p>
+    )
+  }
+</Field>

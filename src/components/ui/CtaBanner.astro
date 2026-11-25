@@ -1,0 +1,39 @@
+---
+import Container from "@/components/ui/Container.astro";
+import Button from "@/components/ui/Button.astro";
+import { cn } from "@/lib/cn";
+
+interface Props {
+  title: string;
+  description?: string;
+  eyebrow?: string;
+  primary: { label: string; href: string };
+  secondary?: { label: string; href: string };
+  class?: string;
+}
+
+const { title, description, eyebrow, primary, secondary, class: className } = Astro.props;
+---
+
+<section class={cn("bg-brand text-brand-foreground print:hidden", className)}>
+  <Container class="py-16 text-center sm:py-20">
+    {eyebrow && <p class="text-sm font-semibold tracking-wider text-white/70 uppercase">{eyebrow}</p>}
+    <h2 class={cn("mx-auto max-w-2xl text-3xl font-bold text-balance sm:text-4xl", eyebrow && "mt-3")}>{title}</h2>
+    {description && <p class="mx-auto mt-4 max-w-xl leading-relaxed text-white/75">{description}</p>}
+    <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+      <Button href={primary.href} variant="accent" size="lg">{primary.label}</Button>
+      {
+        secondary && (
+          <Button
+            href={secondary.href}
+            variant="outline"
+            size="lg"
+            class="border-white/30 bg-transparent text-white hover:bg-white/10"
+          >
+            {secondary.label}
+          </Button>
+        )
+      }
+    </div>
+  </Container>
+</section>

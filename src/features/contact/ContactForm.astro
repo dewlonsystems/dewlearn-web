@@ -1,0 +1,53 @@
+---
+import Form from "@/components/forms/Form.astro";
+import Input from "@/components/forms/Input.astro";
+import PhoneInput from "@/components/forms/PhoneInput.astro";
+import Select from "@/components/forms/Select.astro";
+import Textarea from "@/components/forms/Textarea.astro";
+import Checkbox from "@/components/forms/Checkbox.astro";
+import Captcha from "@/components/forms/Captcha.astro";
+import SubmitButton from "@/components/forms/SubmitButton.astro";
+import { serviceOptions } from "./options";
+---
+
+<Form
+  endpoint="/api/contact"
+  successTitle="Message sent"
+  successMessage="Thank you for reaching out. We'll get back to you at the email address you provided."
+  againLabel="Send another message"
+  confirm={{
+    title: "Send your message?",
+    message: "We'll reply to the email address you provided.",
+    confirmLabel: "Send message",
+  }}
+>
+  <div class="grid gap-5 sm:grid-cols-2">
+    <Input name="name" label="Full name" required autocomplete="name" minlength={2} maxlength={100} placeholder="Jane Wanjiku" />
+    <Input name="email" type="email" label="Email address" required autocomplete="email" placeholder="you@company.com" />
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <PhoneInput name="phone" label="Phone number" />
+    <Select name="service" label="What do you need?" required options={serviceOptions} />
+  </div>
+
+  <Textarea
+    name="message"
+    label="Project details"
+    required
+    rows={6}
+    minlength={20}
+    maxlength={2000}
+    showCount
+    placeholder="Tell us about your project, goals and timeline."
+  />
+
+  <Checkbox name="consent" required>
+    I agree to Dewlon Systems using my details to respond to this enquiry, as described in the
+    <a href="/privacy-policy" class="text-primary underline underline-offset-2">Privacy Policy</a>.
+  </Checkbox>
+
+  <Captcha />
+
+  <SubmitButton class="w-full sm:w-auto">Send message</SubmitButton>
+</Form>

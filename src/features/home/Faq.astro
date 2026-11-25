@@ -1,0 +1,35 @@
+---
+import { Icon } from "astro-icon/components";
+import Section from "@/components/ui/Section.astro";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import { faqs } from "./content";
+
+// Same "name" on every <details> makes the browser keep only one open at a time
+const exclusive = { name: "faq" };
+---
+
+<Section id="faq" tone="muted">
+  <div class="grid gap-10 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:gap-16">
+    <div class="lg:sticky lg:top-28 lg:self-start">
+      <SectionHeading eyebrow="Common questions" title="Everything you need to know" />
+      <p class="mt-6 text-sm text-muted">
+        Can’t find your answer?
+        <a href="/contact" class="font-medium text-primary underline underline-offset-2">Ask us directly</a>.
+      </p>
+    </div>
+
+    <div class="divide-y divide-border border-y border-border">
+      {
+        faqs.map((faq) => (
+          <details {...exclusive} class="group">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-left font-medium transition-colors hover:text-primary [&::-webkit-details-marker]:hidden">
+              {faq.q}
+              <Icon name="lucide:plus" class="size-5 shrink-0 text-muted transition-transform group-open:rotate-45" />
+            </summary>
+            <p class="pb-6 leading-relaxed text-muted">{faq.a}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</Section>

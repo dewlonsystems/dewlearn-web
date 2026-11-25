@@ -1,0 +1,30 @@
+---
+import { cn } from "@/lib/cn";
+
+interface Props {
+  id: string;
+  label: string;
+  hint?: string;
+  required?: boolean | string | null;
+  class?: string;
+}
+
+const { id, label, hint, required, class: className } = Astro.props;
+const isRequired = required !== undefined && required !== null && required !== false;
+---
+
+<div data-field class={cn("space-y-1.5", className)}>
+  <label for={id} class="block text-sm font-medium">
+    {label}
+    {
+      isRequired ? (
+        <span aria-hidden="true" class="text-danger">*</span>
+      ) : (
+        <span class="font-normal text-muted">(optional)</span>
+      )
+    }
+  </label>
+  <slot />
+  {hint && <p id={`${id}-hint`} class="text-xs text-muted">{hint}</p>}
+  <p id={`${id}-error`} data-error hidden class="text-xs font-medium text-danger"></p>
+</div>

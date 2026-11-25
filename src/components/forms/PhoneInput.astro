@@ -1,0 +1,59 @@
+---
+import { Icon } from "astro-icon/components";
+import Field from "@/components/forms/Field.astro";
+import { cn } from "@/lib/cn";
+import { controlClass } from "@/lib/ui/classes";
+import { defaultDialCode, dialCodes } from "@/config/dial-codes";
+
+interface Props {
+  name: string;
+  label: string;
+  id?: string;
+  hint?: string;
+  required?: boolean;
+  placeholder?: string;
+  wrapperClass?: string;
+}
+
+const {
+  name,
+  label,
+  id = `field-${name}`,
+  hint,
+  required,
+  placeholder = "712 345 678",
+  wrapperClass,
+} = Astro.props;
+
+const describedBy = [hint ? `${id}-hint` : "", `${id}-error`].filter(Boolean).join(" ");
+---
+
+<Field {id} {label} {hint} {required} class={wrapperClass}>
+  <div data-phone class="flex gap-2">
+    <div class="relative shrink-0">
+      <select
+        data-phone-country
+        aria-label="Country code"
+        class={cn(controlClass, "h-11 w-28 cursor-pointer appearance-none pr-8")}
+      >
+        {dialCodes.map((c) => <option value={c.dial} selected={c.dial === defaultDialCode}>{c.country} {c.dial}</option>)}
+      </select>
+      <Icon
+        name="lucide:chevron-down"
+        class="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-muted"
+      />
+    </div>
+    <input
+      data-phone-number
+      {id}
+      type="tel"
+      inputmode="tel"
+      autocomplete="tel-national"
+      {placeholder}
+      {required}
+      aria-describedby={describedBy}
+      class={cn(controlClass, "h-11 min-w-0 flex-1")}
+    />
+    <input type="hidden" {name} data-phone-value />
+  </div>
+</Field>

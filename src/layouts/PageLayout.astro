@@ -1,0 +1,38 @@
+---
+import type { ComponentProps } from "astro/types";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Header from "@/components/layout/Header.astro";
+import Footer from "@/components/layout/Footer.astro";
+import ProgressBar from "@/components/layout/ProgressBar.astro";
+import FloatingContactButton from "@/components/layout/FloatingContactButton.astro";
+import CookieBanner from "@/components/layout/CookieBanner.astro";
+import CookieModal from "@/components/layout/CookieModal.astro";
+
+type Props = ComponentProps<typeof BaseLayout> & {
+  /** Set on pages that start with a dark hero: the header is transparent until you scroll. */
+  overlayHeader?: boolean;
+};
+
+const { overlayHeader = false, ...seo } = Astro.props;
+---
+
+<BaseLayout {...seo}>
+  <Fragment slot="head"><slot name="head" /></Fragment>
+
+  <a
+    href="#main"
+    class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-70 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+  >
+    Skip to content
+  </a>
+
+  <ProgressBar />
+  <Header overlay={overlayHeader} />
+  <main id="main" class="min-h-[60dvh]">
+    <slot />
+  </main>
+  <Footer />
+  <FloatingContactButton />
+  <CookieBanner />
+  <CookieModal />
+</BaseLayout>

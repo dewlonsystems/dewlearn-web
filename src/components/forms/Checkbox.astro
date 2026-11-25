@@ -1,0 +1,32 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cn } from "@/lib/cn";
+
+interface Props extends Omit<HTMLAttributes<"input">, "id" | "name" | "type"> {
+  name: string;
+  id?: string;
+  wrapperClass?: string;
+}
+
+const { name, id = `field-${name}`, wrapperClass, class: className, required, value = "on", ...rest } = Astro.props;
+---
+
+<div data-field class={cn("space-y-1.5", wrapperClass)}>
+  <label for={id} class="flex cursor-pointer items-start gap-3 text-sm leading-relaxed">
+    <input
+      {...rest}
+      type="checkbox"
+      {id}
+      {name}
+      {value}
+      {required}
+      aria-describedby={`${id}-error`}
+      class={cn(
+        "mt-0.5 size-5 shrink-0 cursor-pointer rounded accent-primary aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-danger",
+        className,
+      )}
+    />
+    <span><slot /></span>
+  </label>
+  <p id={`${id}-error`} data-error hidden class="text-xs font-medium text-danger"></p>
+</div>

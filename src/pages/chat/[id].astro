@@ -1,0 +1,24 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import ChatApp from "@/components/chat/ChatApp.astro";
+import CookieBanner from "@/components/layout/CookieBanner.astro";
+import CookieModal from "@/components/layout/CookieModal.astro";
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const { id } = Astro.params;
+
+// Anything that isn't a real UUID just starts a new chat
+if (!id || !UUID.test(id)) return Astro.redirect("/chat");
+---
+
+<BaseLayout
+  title="Chat with Dewi"
+  description="Chat with Dewi, the Dewlon Systems AI assistant."
+  noindex
+>
+  <ChatApp chatId={id.toLowerCase()} />
+  <CookieBanner />
+  <CookieModal />
+</BaseLayout>

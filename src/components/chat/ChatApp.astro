@@ -1,0 +1,248 @@
+---
+import { Icon } from "astro-icon/components";
+import Logo from "@/components/ui/Logo.astro";
+
+interface Props {
+  chatId: string;
+}
+
+const { chatId } = Astro.props;
+
+const suggestions = [
+  "What services do you offer?",
+  "How much does a website cost?",
+  "How do I get a quote?",
+  "Tell me about DewLearn School Manager.",
+];
+
+const avatar =
+  "mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary font-display text-xs font-bold text-primary-foreground";
+---
+
+<div data-chat-root data-chat-id={chatId} class="flex h-dvh overflow-hidden bg-background">
+  <div data-sidebar-backdrop hidden class="fixed inset-0 z-40 bg-black/50 lg:hidden"></div>
+
+  <!-- Sidebar -->
+  <aside
+    data-sidebar
+    id="chat-sidebar"
+    aria-label="Chat history"
+    class="fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col border-r border-border bg-surface transition-transform duration-200 data-open:translate-x-0 lg:static lg:z-auto lg:translate-x-0"
+  >
+    <div class="flex h-14 shrink-0 items-center justify-between border-b border-border px-4">
+      <Logo />
+      <button
+        type="button"
+        data-sidebar-toggle
+        aria-label="Close chat history"
+        class="-mr-2 inline-flex size-10 items-center justify-center rounded-md text-muted hover:bg-foreground/5 hover:text-foreground lg:hidden"
+      >
+        <Icon name="lucide:x" class="size-5" />
+      </button>
+    </div>
+
+    <div class="p-3">
+      <a
+        href="/chat"
+        rel="nofollow"
+        data-astro-prefetch="false"
+        class="flex h-10 w-full items-center justify-center gap-2 rounded-md bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+      >
+        <Icon name="lucide:plus" class="size-4" />
+        New chat
+      </a>
+    </div>
+
+    <nav aria-label="Saved chats" class="min-h-0 flex-1 overflow-y-auto px-3 pb-3">
+      <p class="px-3 pb-2 text-xs font-semibold tracking-wider text-muted uppercase">Recent</p>
+      <ul data-chat-list class="space-y-0.5"></ul>
+      <p data-empty class="px-3 py-2 text-sm text-muted">Your conversations will appear here.</p>
+    </nav>
+
+    <div class="shrink-0 space-y-3 border-t border-border p-4 text-xs leading-relaxed text-muted">
+      <p data-note-saved hidden>Chats are saved on this device only.</p>
+      <p data-note-session hidden>
+        Chats are kept for this browser session only.
+        <button type="button" data-cookie-settings class="text-primary underline underline-offset-2">
+          Allow saving
+        </button>
+      </p>
+      <div class="flex items-center justify-between">
+        <a href="/" class="inline-flex items-center gap-1.5 transition-colors hover:text-foreground">
+          <Icon name="lucide:arrow-left" class="size-3.5" />
+          Back to website
+        </a>
+        <button type="button" data-clear-all class="transition-colors hover:text-danger">Clear all</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header class="flex h-14 shrink-0 items-center gap-3 border-b border-border px-4">
+      <button
+        type="button"
+        data-sidebar-toggle
+        aria-expanded="false"
+        aria-controls="chat-sidebar"
+        aria-label="Open chat history"
+        class="-ml-2 inline-flex size-10 items-center justify-center rounded-md hover:bg-foreground/5 lg:hidden"
+      >
+        <Icon name="lucide:menu" class="size-5" />
+      </button>
+
+      <span aria-hidden="true" class:list={[avatar, "mt-0 size-9 text-sm"]}>D</span>
+      <div class="min-w-0">
+        <h1 class="font-sans text-sm leading-tight font-semibold">Dewi</h1>
+        <p class="truncate text-xs text-muted">AI assistant · Dewlon Systems</p>
+      </div>
+
+      <a
+        href="/contact"
+        class="ml-auto inline-flex h-9 items-center rounded-md border border-border px-3 text-sm font-medium transition-colors hover:bg-foreground/5"
+      >
+        <span class="hidden sm:inline">Talk to our team</span>
+        <span class="sm:hidden">Team</span>
+      </a>
+    </header>
+
+    <div data-scroller class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <div class="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6">
+        <div
+          data-thread
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions"
+          aria-label="Conversation"
+          class="space-y-5"
+        >
+        </div>
+
+        <div data-suggestions hidden class="mt-6 grid gap-2 sm:grid-cols-2">
+          <p class="text-xs font-semibold tracking-wider text-muted uppercase sm:col-span-2">Suggested questions</p>
+          {
+            suggestions.map((text) => (
+              <button
+                type="button"
+                data-suggestion
+                class="rounded-lg border border-border bg-surface px-4 py-3 text-left text-sm transition-colors hover:border-primary/60 hover:bg-foreground/5"
+              >
+                {text}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="shrink-0 border-t border-border bg-background px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6"
+    >
+      <form
+        data-composer
+        class="mx-auto flex w-full max-w-3xl items-end gap-2 rounded-xl border border-border bg-surface p-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+      >
+        <label for="chat-input" class="sr-only">Message Dewi</label>
+        <textarea
+          id="chat-input"
+          data-input
+          rows="1"
+          maxlength="800"
+          placeholder="Ask about our services…"
+          class="max-h-40 min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-base leading-6 outline-none placeholder:text-muted sm:text-sm"
+        ></textarea>
+        <button
+          type="submit"
+          data-send
+          disabled
+          aria-label="Send message"
+          class="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:bg-accent/90 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <Icon name="lucide:arrow-up" class="size-5" />
+        </button>
+      </form>
+      <p class="mx-auto mt-2 max-w-3xl text-center text-xs text-muted">
+        Dewi is an AI assistant and can make mistakes. Messages are processed by a third-party AI provider.
+        <a href="/privacy-policy" class="underline underline-offset-2">Privacy Policy</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Templates cloned by the chat script -->
+  <template data-tpl="user">
+    <div class="flex justify-end">
+      <div
+        data-content
+        class="max-w-[85%] rounded-2xl rounded-br-md bg-primary px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap text-primary-foreground [overflow-wrap:anywhere] sm:max-w-[75%]"
+      >
+      </div>
+    </div>
+  </template>
+
+  <template data-tpl="assistant">
+    <div class="flex items-start gap-3">
+      <span aria-hidden="true" class={avatar}>D</span>
+      <div
+        data-content
+        class="max-w-[85%] min-w-0 space-y-2 rounded-2xl rounded-tl-md border border-border bg-surface px-4 py-2.5 text-sm leading-relaxed [overflow-wrap:anywhere] sm:max-w-[80%] [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_code]:rounded [&_code]:bg-foreground/10 [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.85em] [&_ol]:list-decimal [&_ol]:space-y-1 [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-5"
+      >
+      </div>
+    </div>
+  </template>
+
+  <template data-tpl="typing">
+    <div class="flex items-start gap-3" role="status">
+      <span aria-hidden="true" class={avatar}>D</span>
+      <div class="flex items-center gap-1.5 rounded-2xl rounded-tl-md border border-border bg-surface px-4 py-3.5">
+        <span class="sr-only">Dewi is typing</span>
+        <span class="size-1.5 animate-bounce rounded-full bg-muted"></span>
+        <span class="size-1.5 animate-bounce rounded-full bg-muted [animation-delay:150ms]"></span>
+        <span class="size-1.5 animate-bounce rounded-full bg-muted [animation-delay:300ms]"></span>
+      </div>
+    </div>
+  </template>
+
+  <template data-tpl="error">
+    <div class="flex items-start gap-3">
+      <span aria-hidden="true" class={avatar}>D</span>
+      <div
+        class="max-w-[85%] rounded-2xl rounded-tl-md border border-danger/40 bg-danger/5 px-4 py-2.5 text-sm sm:max-w-[80%]"
+      >
+        <p data-message class="text-danger"></p>
+        <button type="button" data-retry class="mt-2 font-medium text-primary underline underline-offset-2">
+          Try again
+        </button>
+      </div>
+    </div>
+  </template>
+
+  <template data-tpl="chat-item">
+    <li class="group relative">
+      <a
+        data-link
+        href="#"
+        rel="nofollow"
+        data-astro-prefetch="false"
+        class="block rounded-md px-3 py-2.5 pr-11 text-sm transition-colors hover:bg-foreground/5 aria-[current=page]:bg-primary/10 aria-[current=page]:font-medium"
+      >
+        <span data-title class="block truncate"></span>
+        <span data-time class="block text-xs font-normal text-muted"></span>
+      </a>
+      <button
+        type="button"
+        data-delete
+        aria-label="Delete chat"
+        class="absolute top-1/2 right-1.5 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-muted transition hover:bg-foreground/10 hover:text-danger focus-visible:opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
+      >
+        <Icon name="lucide:trash-2" class="size-4" />
+      </button>
+    </li>
+  </template>
+</div>
+
+<script>
+  import { initChat } from "@/lib/chat/client";
+
+  const root = document.querySelector<HTMLElement>("[data-chat-root]");
+  if (root) initChat(root);
+</script>

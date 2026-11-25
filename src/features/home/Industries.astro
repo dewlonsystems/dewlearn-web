@@ -1,0 +1,28 @@
+---
+import { Icon } from "astro-icon/components";
+import Section from "@/components/ui/Section.astro";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import { industries } from "./content";
+---
+
+<Section id="industries">
+  <SectionHeading
+    eyebrow="Industries"
+    title="Deep expertise across Kenya’s key sectors"
+    description="We bring sector knowledge to every project: your regulations, your users and the systems you need to connect to."
+  />
+
+  <ul class="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+    {
+      industries.map((industry) => (
+        <li>
+          <span class="flex size-11 items-center justify-center rounded-md bg-primary/10 text-primary">
+            <Icon name={industry.icon} class="size-5" />
+          </span>
+          <h3 class="mt-4 font-sans text-base font-semibold">{industry.label}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-muted">{industry.text}</p>
+        </li>
+      ))
+    }
+  </ul>
+</Section>

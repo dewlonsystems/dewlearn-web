@@ -1,0 +1,49 @@
+---
+import { Icon } from "astro-icon/components";
+import Section from "@/components/ui/Section.astro";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import Button from "@/components/ui/Button.astro";
+import { reviewLinks, testimonials } from "./content";
+---
+
+<Section id="testimonials">
+  <SectionHeading eyebrow="Client testimonials" title="What our clients say about us" />
+
+  <ul class="mt-12 grid gap-6 lg:grid-cols-3">
+    {
+      testimonials.map((t) => (
+        <li class="flex">
+          <figure class="flex w-full flex-col rounded-lg border border-border bg-surface p-7">
+            <div class="flex gap-0.5 text-warning" role="img" aria-label="5 out of 5 stars">
+              {Array.from({ length: 5 }).map(() => <Icon name="lucide:star" class="size-4 fill-current" />)}
+            </div>
+            <blockquote class="mt-5 flex-1 leading-relaxed">“{t.text}”</blockquote>
+            <figcaption class="mt-6 flex items-center gap-3 border-t border-border pt-5">
+              <span
+                aria-hidden="true"
+                class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground"
+              >
+                {t.initials}
+              </span>
+              <span class="min-w-0">
+                <span class="block text-sm font-semibold">{t.name}</span>
+                <span class="block text-sm text-muted">{t.role}</span>
+              </span>
+            </figcaption>
+          </figure>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="mt-10 flex flex-col gap-3 sm:flex-row sm:justify-center">
+    <Button href={reviewLinks.all} target="_blank" rel="noopener noreferrer" variant="outline">
+      <Icon name="fa6-brands:google" class="size-4" />
+      Read our reviews
+    </Button>
+    <Button href={reviewLinks.leave} target="_blank" rel="noopener noreferrer">
+      Leave us a review
+      <Icon name="lucide:arrow-up-right" class="size-4" />
+    </Button>
+  </div>
+</Section>

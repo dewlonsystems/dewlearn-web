@@ -1,0 +1,65 @@
+---
+import { Icon } from "astro-icon/components";
+import Button from "@/components/ui/Button.astro";
+---
+
+<dialog
+  id="confirm-dialog"
+  aria-labelledby="confirm-title"
+  aria-describedby="confirm-message"
+  class="m-auto w-[calc(100%-2rem)] max-w-md rounded-xl border border-border bg-surface p-0 text-foreground shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-sm open:animate-zoom-in"
+>
+  <div class="p-6">
+    <div class="flex gap-4">
+      <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <span data-confirm-icon-default class="flex"><Icon name="lucide:circle-help" class="size-5" /></span>
+        <span data-confirm-icon-danger hidden class="flex text-danger"><Icon name="lucide:triangle-alert" class="size-5" /></span>
+      </span>
+      <div class="min-w-0">
+        <h2 id="confirm-title" data-confirm-title class="font-sans text-lg font-semibold"></h2>
+        <p id="confirm-message" data-confirm-message class="mt-2 text-sm leading-relaxed text-muted"></p>
+      </div>
+    </div>
+
+    <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+      <Button variant="outline" data-confirm-cancel>Cancel</Button>
+      <Button data-confirm-ok>Confirm</Button>
+      <Button variant="danger" data-confirm-danger hidden>Delete</Button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  import { confirmAction } from "@/lib/ui/confirm";
+
+  const dialog = document.querySelector<HTMLDialogElement>("#confirm-dialog");
+
+  if (dialog) {
+    dialog
+      .querySelectorAll("[data-confirm-ok], [data-confirm-danger]")
+      .forEach((button) => button.addEventListener("click", () => dialog.close("confirm")));
+    dialog.querySelector("[data-confirm-cancel]")?.addEventListener("click", () => dialog.close("cancel"));
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close("cancel"); // the dimmed backdrop
+    });
+  }
+
+  // Declarative use: <button data-confirm="Delete this?" data-confirm-tone="danger">…</button>
+  document.addEventListener("click", async (event) => {
+    const trigger = (event.target as Element).closest<HTMLElement>("[data-confirm]");
+    if (!trigger || trigger.dataset.confirmed) return;
+
+    event.preventDefault();
+    const ok = await confirmAction({
+      title: trigger.dataset.confirm || "Are you sure?",
+      message: trigger.dataset.confirmMessage,
+      confirmLabel: trigger.dataset.confirmLabel,
+      tone: trigger.dataset.confirmTone === "danger" ? "danger" : "default",
+    });
+    if (!ok) return;
+
+    trigger.dataset.confirmed = "true"; // lets the replayed click through
+    trigger.click();
+    delete trigger.dataset.confirmed;
+  });
+</script>

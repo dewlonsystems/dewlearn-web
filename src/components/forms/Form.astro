@@ -1,0 +1,72 @@
+---
+import { Icon } from "astro-icon/components";
+import { cn } from "@/lib/cn";
+
+interface Props {
+  endpoint: string;
+  successTitle?: string;
+  successMessage?: string;
+  againLabel?: string;
+  confirm?: { title: string; message?: string; confirmLabel?: string; cancelLabel?: string };
+  class?: string;
+}
+
+const {
+  endpoint,
+  successTitle = "Thank you",
+  successMessage = "We have received your submission.",
+  againLabel = "Send another",
+  confirm,
+  class: className,
+} = Astro.props;
+---
+
+<form
+  data-form
+  data-endpoint={endpoint}
+  data-confirm-options={confirm ? JSON.stringify(confirm) : undefined}
+  method="post"
+  novalidate
+  class={cn("relative", className)}
+>
+  <div data-form-body class="space-y-5">
+    <slot />
+    <div
+      data-form-status
+      hidden
+      role="alert"
+      class="rounded-md border border-danger/40 bg-danger/5 px-4 py-3 text-sm text-danger"
+    >
+    </div>
+  </div>
+
+  <!-- Honeypot: invisible to people, tempting to bots -->
+  <div aria-hidden="true" class="absolute left-[-9999px] h-0 w-0 overflow-hidden">
+    <input type="text" name="hpField" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <div
+    data-form-success
+    hidden
+    tabindex="-1"
+    class="rounded-lg border border-border bg-surface p-8 text-center outline-none"
+  >
+    <span class="mx-auto flex size-12 items-center justify-center rounded-full bg-success/15 text-success">
+      <Icon name="lucide:circle-check" class="size-6" />
+    </span>
+    <h3 class="mt-4 font-sans text-lg font-semibold">{successTitle}</h3>
+    <p class="mt-2 text-sm leading-relaxed text-muted">{successMessage}</p>
+    <button
+      type="button"
+      data-form-again
+      class="mt-6 text-sm font-medium text-primary underline underline-offset-2"
+    >
+      {againLabel}
+    </button>
+  </div>
+</form>
+
+<script>
+  import { initForms } from "@/lib/forms/client";
+  initForms();
+</script>

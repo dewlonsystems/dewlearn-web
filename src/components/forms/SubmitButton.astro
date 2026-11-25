@@ -1,0 +1,19 @@
+---
+import { Icon } from "astro-icon/components";
+import Button from "@/components/ui/Button.astro";
+import type { ComponentProps } from "astro/types";
+
+interface Props {
+  loadingLabel?: string;
+  variant?: ComponentProps<typeof Button>["variant"];
+  size?: ComponentProps<typeof Button>["size"];
+  class?: string;
+}
+
+const { loadingLabel = "Sending…", variant = "primary", size = "lg", class: className } = Astro.props;
+---
+
+<Button type="submit" {variant} {size} class={className} data-submit data-loading-label={loadingLabel}>
+  <Icon name="lucide:loader-circle" data-spinner class="hidden size-4 animate-spin" />
+  <span data-label><slot /></span>
+</Button>

@@ -1,0 +1,45 @@
+// src/app/robots.ts
+import type { MetadataRoute } from "next";
+
+export const dynamic = "force-static";
+
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: [
+      {
+        // All well-behaved crawlers
+        userAgent: "*",
+        allow: "/",
+        disallow: [
+          "/api/",
+          "/_next/",
+          "/admin/",
+          "/dashboard/",
+          "/studio/",   // Sanity CMS studio if you use it
+          "/*.json$",   // block raw JSON endpoints
+        ],
+      },
+      {
+        // Block AI training scrapers
+        userAgent: [
+          "GPTBot",
+          "ChatGPT-User",
+          "Google-Extended",
+          "CCBot",
+          "anthropic-ai",
+          "Claude-Web",
+          "Omgilibot",
+          "FacebookBot",
+        ],
+        disallow: ["/"],
+      },
+    ],
+    sitemap: [
+      "https://dewlons.com/sitemap.xml",
+      "https://dewlons.com/news-sitemap.xml",
+    ],
+    host: "https://dewlons.com",
+  };
+}
+
+apple-touch-icon

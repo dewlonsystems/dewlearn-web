@@ -1,0 +1,103 @@
+---
+import { Icon } from "astro-icon/components";
+import { getEntry, render } from "astro:content";
+import PageLayout from "@/layouts/PageLayout.astro";
+import PageHero from "@/components/ui/PageHero.astro";
+import Container from "@/components/ui/Container.astro";
+import CtaBanner from "@/components/ui/CtaBanner.astro";
+import JsonLd from "@/components/seo/JsonLd.astro";
+import TableOfContents from "@/features/legal/TableOfContents.astro";
+import { siteConfig } from "@/config/site";
+import { webPageSchema } from "@/lib/schema";
+
+interface Props {
+  /** File name in src/content/legal, without .md */
+  slug: string;
+  /** Public URL path */
+  path: string;
+}
+
+const { slug, path } = Astro.props;
+
+const entry = await getEntry("legal", slug);
+if (!entry) throw new Error(`Legal document "${slug}" was not found in src/content/legal`);
+
+const { Content, headings } = await render(entry);
+const { title, description, intro, updated, keyFacts, cta } = entry.data;
+
+const updatedLabel = updated.toLocaleDateString("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+// Typography plugin, tuned to our colour tokens so light and dark mode both work
+const prose = [
+  "prose max-w-none",
+  "[--tw-prose-body:var(--foreground)] [--tw-prose-headings:var(--foreground)] [--tw-prose-bold:var(--foreground)]",
+  "[--tw-prose-links:var(--primary)] [--tw-prose-bullets:var(--primary)] [--tw-prose-counters:var(--muted)]",
+  "[--tw-prose-quotes:var(--foreground)] [--tw-prose-quote-borders:var(--primary)] [--tw-prose-hr:var(--border)]",
+  "[--tw-prose-th-borders:var(--border)] [--tw-prose-td-borders:var(--border)] [--tw-prose-captions:var(--muted)]",
+  "prose-h2:mt-14 prose-h2:scroll-mt-28 prose-h2:border-t prose-h2:border-border prose-h2:pt-8 prose-h2:text-2xl",
+  "prose-h3:mt-8 prose-h3:scroll-mt-28 prose-h3:text-lg",
+  "prose-li:my-1.5 prose-a:font-medium prose-a:underline-offset-2 prose-strong:font-semibold",
+  "prose-blockquote:rounded-r-md prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:px-5 prose-blockquote:py-1 prose-blockquote:font-normal prose-blockquote:not-italic",
+  "[&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none",
+  "prose-table:block prose-table:w-full prose-table:overflow-x-auto prose-table:text-sm prose-th:bg-surface prose-th:px-3 prose-td:px-3",
+].join(" ");
+---
+
+<PageLayout {title} {description} overlayHeader>
+  <JsonLd slot="head" data={webPageSchema({ path, name: title, description, modified: updated })} />
+
+  <PageHero crumbs={[{ name: title, path }]} eyebrow="Legal" {title} description={intro}>
+    <p class="inline-flex items-center gap-2 rounded-full border border-white/25 px-3 py-1 text-xs font-medium text-white/85">
+      <Icon name="lucide:calendar" class="size-3.5" />
+      Last updated <time datetime={updated.toISOString().slice(0, 10)}>{updatedLabel}</time>
+    </p>
+  </PageHero>
+
+  <Container class="py-12 lg:py-16">
+    <div class="grid gap-8 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16">
+      <aside class="space-y-6 print:hidden lg:sticky lg:top-24 lg:max-h-[calc(100dvh-7rem)] lg:self-start lg:overflow-y-auto">
+        <TableOfContents headings={headings} />
+
+        {
+          keyFacts && keyFacts.length > 0 && (
+            <section class="rounded-lg bg-brand p-5 text-brand-foreground">
+              <h2 class="font-sans text-xs font-semibold tracking-wider text-white/70 uppercase">Key facts</h2>
+              <dl class="mt-3 divide-y divide-white/15 text-sm">
+                {keyFacts.map((fact) => (
+                  <div class="flex justify-between gap-4 py-2.5">
+                    <dt class="text-white/70">{fact.label}</dt>
+                    <dd class="text-right font-medium">{fact.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )
+        }
+
+        <p class="text-sm text-muted">
+          Questions? Email
+          <a href={`mailto:${siteConfig.contact.email}`} class="font-medium text-primary underline underline-offset-2">
+            {siteConfig.contact.email}
+          </a>
+        </p>
+      </aside>
+
+      <article class={prose}>
+        <Content />
+      </article>
+    </div>
+  </Container>
+
+  <CtaBanner
+    eyebrow={cta.eyebrow}
+    title={cta.title}
+    description={cta.description}
+    primary={{ label: "Get in touch", href: "/contact" }}
+    secondary={{ label: siteConfig.contact.email, href: `mailto:${siteConfig.contact.email}` }}
+  />
+</PageLayout>

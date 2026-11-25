@@ -1,0 +1,3 @@
+// One look for every text control, so Input, Select, Textarea and Phone always match
+export const controlClass =
+  "block w-full rounded-md border border-border bg-surface px-3.5 text-base text-foreground transition-colors placeholder:text-muted/70 hover:border-foreground/30 focus:border-primary focus-visible:outline-offset-0 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger sm:text-sm";

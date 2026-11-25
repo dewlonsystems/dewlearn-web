@@ -1,0 +1,484 @@
+---
+import { Icon } from "astro-icon/components";
+import Container from "@/components/ui/Container.astro";
+import Button from "@/components/ui/Button.astro";
+import Logo from "@/components/ui/Logo.astro";
+import { headerNav, headerCta, megaMenuHelp, isGroup, type NavGroup } from "@/config/navigation";
+import { socialLinks } from "@/config/social";
+import { siteConfig } from "@/config/site";
+import { cn } from "@/lib/cn";
+
+interface Props {
+  /** Transparent over a dark hero until the page scrolls. */
+  overlay?: boolean;
+}
+
+const { overlay = false } = Astro.props;
+
+const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+const groupActive = (group: NavGroup) => group.items.some((item) => isActive(item.href));
+
+const groups = headerNav.filter(isGroup);
+const headerSocials = socialLinks.filter((s) => s.inHeader);
+
+// Full class names so Tailwind can see them
+const panelWidth = { 1: "max-w-md", 2: "max-w-3xl", 3: "max-w-5xl" } as const;
+const panelColumns = { 1: "grid-cols-1", 2: "grid-cols-2", 3: "grid-cols-3" } as const;
+
+const desktopItem =
+  "relative inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-(--hdr-muted) transition-colors hover:text-(--hdr-fg) aria-[current=page]:text-(--hdr-fg) after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-current after:transition-transform aria-[current=page]:after:scale-x-100";
+
+const iconTile =
+  "mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-md border border-border bg-background text-primary transition-colors";
+---
+
+<!-- Dims the page behind an open desktop panel -->
+<div
+  data-mega-backdrop
+  aria-hidden="true"
+  class="invisible fixed inset-0 z-40 hidden bg-black/30 opacity-0 transition-[opacity,visibility] duration-150 data-[open]:visible data-[open]:opacity-100 lg:block"
+>
+</div>
+
+<header
+  data-header
+  data-overlay={overlay ? "" : undefined}
+  data-solid={overlay ? undefined : ""}
+  class={cn(
+    "group/header inset-x-0 top-0 z-50",
+    overlay ? "fixed" : "sticky",
+    "[--hdr-fg:#fff] [--hdr-muted:rgb(255_255_255/0.8)] [--hdr-logo:brightness(0)_invert(1)]",
+    "data-solid:[--hdr-fg:var(--foreground)] data-solid:[--hdr-muted:var(--muted)] data-solid:[--hdr-logo:none]",
+  )}
+>
+  <!-- Background lives on its own layer so it never affects the fixed mobile panel -->
+  <div
+    aria-hidden="true"
+    class="absolute inset-0 -z-10 border-b border-transparent transition-[background-color,border-color,backdrop-filter] duration-200 group-data-[solid]/header:border-border group-data-[solid]/header:bg-background/90 group-data-[solid]/header:backdrop-blur-md"
+  >
+  </div>
+
+  <Container class="flex h-16 items-center gap-6 lg:h-18">
+    <Logo imgClass="size-9 lg:size-10 [filter:var(--hdr-logo)] transition-[filter] duration-200" data-close-mega />
+
+    <!-- Desktop navigation -->
+    <nav aria-label="Main" class="hidden flex-1 lg:block">
+      <ul class="flex items-center justify-center gap-1">
+        {
+          headerNav.map((entry) =>
+            isGroup(entry) ? (
+              <li>
+                <button
+                  type="button"
+                  data-mega-trigger={entry.id}
+                  aria-expanded="false"
+                  aria-controls={`mega-${entry.id}`}
+                  aria-current={groupActive(entry) ? "page" : undefined}
+                  class={cn("group/trigger", desktopItem)}
+                >
+                  {entry.label}
+                  <Icon
+                    name="lucide:chevron-down"
+                    class="size-4 transition-transform duration-200 group-aria-expanded/trigger:rotate-180"
+                  />
+                </button>
+              </li>
+            ) : (
+              <li>
+                <a
+                  href={entry.href}
+                  data-close-mega
+                  aria-current={isActive(entry.href) ? "page" : undefined}
+                  class={desktopItem}
+                >
+                  {entry.label}
+                </a>
+              </li>
+            ),
+          )
+        }
+      </ul>
+    </nav>
+
+    <div class="ml-auto flex items-center gap-2 lg:ml-0">
+      <span data-close-mega class="hidden lg:block">
+        <Button href={headerCta.href} size="sm" variant="accent">{headerCta.label}</Button>
+      </span>
+
+      <button
+        type="button"
+        data-menu-toggle
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label="Open menu"
+        class="-mr-2 inline-flex size-10 items-center justify-center rounded-md text-(--hdr-fg) transition-colors lg:hidden"
+      >
+        <span aria-hidden="true" class="relative block h-4 w-5">
+          <span class="absolute inset-x-0 top-0 h-0.5 rounded-full bg-current transition-transform duration-200 group-data-[menu-open]/header:translate-y-[7px] group-data-[menu-open]/header:rotate-45"></span>
+          <span class="absolute inset-x-0 top-[7px] h-0.5 rounded-full bg-current transition-opacity duration-150 group-data-[menu-open]/header:opacity-0"></span>
+          <span class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-current transition-transform duration-200 group-data-[menu-open]/header:-translate-y-[7px] group-data-[menu-open]/header:-rotate-45"></span>
+        </span>
+      </button>
+    </div>
+  </Container>
+
+  <!-- Desktop panels, one per group -->
+  {
+    groups.map((group) => (
+      <div class="pointer-events-none absolute inset-x-0 top-full hidden justify-center px-6 lg:flex">
+        <div
+          id={`mega-${group.id}`}
+          data-mega-panel={group.id}
+          class={cn(
+            "pointer-events-auto invisible w-full -translate-y-2 pt-2 opacity-0 transition-[opacity,translate,visibility] duration-150 data-[open]:visible data-[open]:translate-y-0 data-[open]:opacity-100",
+            panelWidth[group.columns],
+          )}
+        >
+          <div class="overflow-hidden rounded-lg border border-border bg-surface shadow-xl shadow-black/10">
+            <ul class={cn("grid max-h-[calc(100dvh-12rem)] gap-1 overflow-y-auto p-2", panelColumns[group.columns])}>
+              {group.items.map((item) => (
+                <li>
+                  <a
+                    href={item.href}
+                    aria-current={isActive(item.href) ? "page" : undefined}
+                    class="group flex items-start gap-4 rounded-md p-3 transition-colors hover:bg-foreground/5 focus-visible:bg-foreground/5"
+                  >
+                    {item.icon && (
+                      <span class={cn(iconTile, "group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground")}>
+                        <Icon name={item.icon} class="size-5" />
+                      </span>
+                    )}
+                    <span class="min-w-0">
+                      <span class="block text-sm font-semibold transition-colors group-hover:text-primary">{item.label}</span>
+                      {item.description && (
+                        <span class="mt-0.5 line-clamp-2 block text-sm leading-snug text-muted">{item.description}</span>
+                      )}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+            <div class="flex items-center justify-between gap-4 border-t border-border bg-background px-5 py-3 text-sm">
+              {group.viewAll ? (
+                <a href={group.viewAll.href} class="inline-flex items-center gap-1.5 font-medium text-primary hover:underline">
+                  {group.viewAll.label}
+                  <Icon name="lucide:arrow-right" class="size-4" />
+                </a>
+              ) : (
+                <span />
+              )}
+              <p class="text-muted">
+                {megaMenuHelp.text}{" "}
+                <a href={megaMenuHelp.href} class="font-medium text-primary hover:underline">{megaMenuHelp.label}</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    ))
+  }
+
+  <!-- Mobile menu -->
+  <div
+    id="mobile-menu"
+    data-menu-panel
+    class="invisible fixed inset-x-0 top-16 bottom-0 z-40 flex translate-x-full flex-col border-t border-border bg-background transition-[translate,visibility] duration-300 group-data-[menu-open]/header:visible group-data-[menu-open]/header:translate-x-0 lg:hidden"
+  >
+    <div class="relative min-h-0 flex-1 overflow-hidden">
+      <nav data-menu-root aria-label="Mobile" class="absolute inset-0 overflow-y-auto overscroll-contain px-5">
+        <ul class="divide-y divide-border">
+          {
+            headerNav.map((entry) =>
+              isGroup(entry) ? (
+                <li>
+                  <button
+                    type="button"
+                    data-sheet-open={entry.id}
+                    class="flex w-full items-center justify-between py-4 text-left text-lg font-medium"
+                  >
+                    {entry.label}
+                    <Icon name="lucide:chevron-right" class="size-5 text-muted" />
+                  </button>
+                </li>
+              ) : (
+                <li>
+                  <a
+                    href={entry.href}
+                    aria-current={isActive(entry.href) ? "page" : undefined}
+                    class="block py-4 text-lg font-medium aria-[current=page]:text-primary"
+                  >
+                    {entry.label}
+                  </a>
+                </li>
+              ),
+            )
+          }
+        </ul>
+      </nav>
+
+      {
+        groups.map((group) => (
+          <section
+            data-sheet={group.id}
+            aria-label={group.label}
+            class="invisible absolute inset-0 z-10 flex translate-x-full flex-col bg-background transition-[translate,visibility] duration-250 data-[open]:visible data-[open]:translate-x-0"
+          >
+            <div class="shrink-0 border-b border-border px-5">
+              <button
+                type="button"
+                data-sheet-back
+                aria-label="Back to main menu"
+                class="-ml-1 flex items-center gap-1 py-4 text-lg font-medium"
+              >
+                <Icon name="lucide:chevron-left" class="size-5" />
+                {group.label}
+              </button>
+            </div>
+
+            <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5">
+              <ul class="divide-y divide-border">
+                {group.items.map((item) => (
+                  <li>
+                    <a
+                      href={item.href}
+                      aria-current={isActive(item.href) ? "page" : undefined}
+                      class="group flex items-start gap-4 py-4"
+                    >
+                      {item.icon && (
+                        <span class={cn(iconTile, "group-aria-[current=page]:border-primary group-aria-[current=page]:text-primary")}>
+                          <Icon name={item.icon} class="size-5" />
+                        </span>
+                      )}
+                      <span class="min-w-0">
+                        <span class="block text-sm font-semibold group-aria-[current=page]:text-primary">{item.label}</span>
+                        {item.description && (
+                          <span class="mt-0.5 block text-sm leading-snug text-muted">{item.description}</span>
+                        )}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {group.viewAll && (
+              <div class="shrink-0 border-t border-border bg-surface px-5 py-3">
+                <a href={group.viewAll.href} class="inline-flex items-center gap-1.5 text-sm font-medium text-primary">
+                  {group.viewAll.label}
+                  <Icon name="lucide:arrow-right" class="size-4" />
+                </a>
+              </div>
+            )}
+          </section>
+        ))
+      }
+    </div>
+
+    <div class="shrink-0 border-t border-border px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <Button href={headerCta.href} size="lg" variant="accent" class="w-full">{headerCta.label}</Button>
+      <div class="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+        <p class="text-xs text-muted">{siteConfig.offices.join(" · ")}</p>
+        <ul class="flex items-center gap-4">
+          {
+            headerSocials.map((s) => (
+              <li>
+                <a
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                  class="text-muted transition-colors hover:text-foreground"
+                >
+                  <Icon name={s.icon} class="size-4" />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>("[data-header]");
+
+  if (header) {
+    const overlay = header.hasAttribute("data-overlay");
+    const toggle = header.querySelector<HTMLButtonElement>("[data-menu-toggle]")!;
+    const panel = header.querySelector<HTMLElement>("[data-menu-panel]")!;
+    const rootList = header.querySelector<HTMLElement>("[data-menu-root]")!;
+    const sheets = Array.from(header.querySelectorAll<HTMLElement>("[data-sheet]"));
+    const triggers = Array.from(header.querySelectorAll<HTMLButtonElement>("[data-mega-trigger]"));
+    const megaPanels = Array.from(header.querySelectorAll<HTMLElement>("[data-mega-panel]"));
+    const backdrop = document.querySelector<HTMLElement>("[data-mega-backdrop]");
+
+    const desktop = window.matchMedia("(min-width: 64rem)");
+    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+    let scrolled = false;
+    let megaId: string | null = null;
+    let menuOpen = false;
+    let sheetId: string | null = null;
+    let closeTimer: number | undefined;
+
+    /* ───────── Header look ───────── */
+
+    const syncHeader = () => {
+      header.toggleAttribute("data-solid", !overlay || scrolled || megaId !== null || menuOpen);
+      header.toggleAttribute("data-menu-open", menuOpen);
+    };
+
+    /* ───────── Desktop panels ───────── */
+
+    const setMega = (id: string | null) => {
+      megaId = id;
+      triggers.forEach((t) => t.setAttribute("aria-expanded", String(t.dataset.megaTrigger === id)));
+      megaPanels.forEach((p) => p.toggleAttribute("data-open", p.dataset.megaPanel === id));
+      backdrop?.toggleAttribute("data-open", id !== null);
+      syncHeader();
+    };
+
+    const cancelClose = () => window.clearTimeout(closeTimer);
+    const scheduleClose = () => {
+      cancelClose();
+      closeTimer = window.setTimeout(() => setMega(null), 150);
+    };
+
+    triggers.forEach((trigger) => {
+      const id = trigger.dataset.megaTrigger!;
+      trigger.addEventListener("click", () => setMega(megaId === id ? null : id));
+      trigger.addEventListener("mouseenter", () => {
+        if (!canHover.matches) return;
+        cancelClose();
+        setMega(id);
+      });
+    });
+
+    header.querySelectorAll("[data-close-mega]").forEach((el) =>
+      el.addEventListener("mouseenter", () => {
+        if (canHover.matches) setMega(null);
+      }),
+    );
+
+    header.addEventListener("mouseenter", cancelClose);
+    header.addEventListener("mouseleave", () => {
+      if (canHover.matches && megaId) scheduleClose();
+    });
+    header.addEventListener("focusout", (event) => {
+      const next = event.relatedTarget as Node | null;
+      if (megaId && next && !header.contains(next)) setMega(null);
+    });
+    megaPanels.forEach((p) => p.addEventListener("click", (event) => {
+      if ((event.target as Element).closest("a")) setMega(null);
+    }));
+    backdrop?.addEventListener("click", () => setMega(null));
+
+    /* ───────── Mobile menu ───────── */
+
+    const openSheet = (id: string) => {
+      const sheet = sheets.find((s) => s.dataset.sheet === id);
+      if (!sheet) return;
+      sheetId = id;
+      sheets.forEach((s) => s.toggleAttribute("data-open", s === sheet));
+      rootList.inert = true;
+      // The sheet only becomes focusable once its transition starts
+      window.setTimeout(() => sheet.querySelector<HTMLElement>("[data-sheet-back]")?.focus({ preventScroll: true }), 60);
+    };
+
+    const closeSheet = (restoreFocus: boolean) => {
+      if (!sheetId) return;
+      const id = sheetId;
+      sheetId = null;
+      sheets.forEach((s) => s.removeAttribute("data-open"));
+      rootList.inert = false;
+      if (restoreFocus) rootList.querySelector<HTMLElement>(`[data-sheet-open="${id}"]`)?.focus();
+    };
+
+    const setMenu = (open: boolean) => {
+      menuOpen = open;
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+      document.documentElement.classList.toggle("overflow-hidden", open);
+      document.querySelectorAll<HTMLElement>("main, footer").forEach((el) => (el.inert = open));
+      if (open) setMega(null);
+      else closeSheet(false);
+      syncHeader();
+    };
+
+    toggle.addEventListener("click", () => setMenu(!menuOpen));
+
+    rootList.addEventListener("click", (event) => {
+      const opener = (event.target as Element).closest<HTMLElement>("[data-sheet-open]");
+      if (opener?.dataset.sheetOpen) openSheet(opener.dataset.sheetOpen);
+    });
+
+    panel.addEventListener("click", (event) => {
+      const target = event.target as Element;
+      if (target.closest("[data-sheet-back]")) return closeSheet(true);
+      if (target.closest("a")) setMenu(false);
+    });
+
+    // Swipe right on a sheet to go back
+    sheets.forEach((sheet) => {
+      let startX = 0;
+      let startY = 0;
+      let tracking = false;
+
+      sheet.addEventListener(
+        "touchstart",
+        (event) => {
+          tracking = event.touches.length === 1;
+          startX = event.touches[0].clientX;
+          startY = event.touches[0].clientY;
+        },
+        { passive: true },
+      );
+      sheet.addEventListener(
+        "touchend",
+        (event) => {
+          if (!tracking) return;
+          tracking = false;
+          const dx = event.changedTouches[0].clientX - startX;
+          const dy = Math.abs(event.changedTouches[0].clientY - startY);
+          if (dx > 80 && dx > dy * 1.5) closeSheet(true);
+        },
+        { passive: true },
+      );
+    });
+
+    /* ───────── Global ───────── */
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      if (sheetId) return closeSheet(true);
+      if (menuOpen) {
+        setMenu(false);
+        toggle.focus();
+        return;
+      }
+      if (megaId) {
+        const trigger = triggers.find((t) => t.dataset.megaTrigger === megaId);
+        setMega(null);
+        trigger?.focus();
+      }
+    });
+
+    // Resizing or rotating across the breakpoint resets whichever menu no longer applies
+    desktop.addEventListener("change", () => {
+      setMenu(false);
+      setMega(null);
+    });
+
+    const onScroll = () => {
+      const next = window.scrollY > 8;
+      if (next === scrolled) return;
+      scrolled = next;
+      syncHeader();
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+</script>
